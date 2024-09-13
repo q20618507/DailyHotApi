@@ -1,6 +1,7 @@
 import type { RouterData } from "../types.js";
 import type { RouterType } from "../router.types.js";
 import { get } from "../utils/getData.js";
+import { getTime } from "../utils/getTime.js";
 
 export const handleRoute = async (_: undefined, noCache: boolean) => {
   const { fromCache, data, updateTime } = await getList(noCache);
@@ -31,8 +32,9 @@ const getList = async (noCache: boolean) => {
         id: v.mid,
         title: v.word,
         desc: v.note || key,
-        author: v.category,
-        hot: v.raw_hot,
+        author: v.flag_desc,
+        timestamp: getTime(v.onboard_time),
+        hot: v.num,
         url: `https://s.weibo.com/weibo?q=${encodeURIComponent(key)}&t=31&band_rank=1&Refer=top`,
         mobileUrl: `https://s.weibo.com/weibo?q=${encodeURIComponent(
           key,

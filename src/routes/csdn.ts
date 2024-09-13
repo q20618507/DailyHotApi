@@ -6,10 +6,11 @@ import { getTime } from "../utils/getTime.js";
 export const handleRoute = async (_: undefined, noCache: boolean) => {
   const { fromCache, data, updateTime } = await getList(noCache);
   const routeData: RouterData = {
-    name: "zhihu",
-    title: "知乎",
-    type: "热榜",
-    link: "https://www.zhihu.com/hot",
+    name: "csdn",
+    title: "CSDN",
+    type: "排行榜",
+    description: "专业开发者社区",
+    link: "https://www.csdn.net/",
     total: data?.length || 0,
     updateTime,
     fromCache,
@@ -19,24 +20,22 @@ export const handleRoute = async (_: undefined, noCache: boolean) => {
 };
 
 const getList = async (noCache: boolean) => {
-  const url = `https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true`;
+  const url = "https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=30";
   const result = await get({ url, noCache });
   const list = result.data.data;
   return {
     fromCache: result.fromCache,
     updateTime: result.updateTime,
-    data: list.map((v: RouterType["zhihu"]) => {
-      const data = v.target;
-      return {
-        id: data.id,
-        title: data.title,
-        desc: data.excerpt,
-        cover: v.children[0].thumbnail,
-        timestamp: getTime(data.created),
-        hot: parseFloat(v.detail_text.split(" ")[0]) * 10000,
-        url: `https://www.zhihu.com/question/${data.id}`,
-        mobileUrl: `https://www.zhihu.com/question/${data.id}`,
-      };
-    }),
+    data: list.map((v: RouterType["csdn"]) => ({
+      id: v.productId,
+      title: v.articleTitle,
+      cover: v.picList?.[0] || null,
+      desc: null,
+      author: v.nickName,
+      timestamp: getTime(v.period),
+      hot: Number(v.hotRankScore),
+      url: v.articleDetailUrl,
+      mobileUrl: v.articleDetailUrl,
+    })),
   };
 };
